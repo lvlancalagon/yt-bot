@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Подключение YouTube</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body style="font-family: Arial, sans-serif; text-align: center; padding-top: 50px; background-color: #f4f4f9;">
+    
+    <h2>Подключение канала</h2>
+    <p>Нажми на кнопку ниже, чтобы разрешить боту смотреть статистику твоего канала.</p>
+    
+    <button onclick="handleAuth()" style="padding: 15px 30px; font-size: 16px; background-color: #0088cc; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        🔗 Войти через Google
+    </button>
+    
+    <p id="status" style="color: green; display: none;">✅ Успешно! Возвращаю в бота...</p>
+
+    <script>
+        // ВСТАВЬ СЮДА СВОЙ CLIENT ID, который скопировал в пункте 1
+        const CLIENT_ID = '651780173069-195ikrhgte50sa85af9vlf0ujh9d9fda.apps.googleusercontent.com'; 
+        
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        function handleAuth() {
+            // Настройки запроса прав (читаем профиль и аналитику)
+            const tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: 'https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/yt-analytics.readonly',
+                callback: (response) => {
+                    if (response.access_token) {
+                        document.getElementById('status').style.display = 'block';
+                        // Отправляем ТОКЕН обратно в наш Телеграм-бот
+                        tg.sendData(response.access_token);
+                        // Закрываем окно
+                        setTimeout(() => tg.close(), 1000);
+                    } else {
+                        alert('Ошибка авторизации. Попробуй еще раз.');
+                    }
+                },
+            });
+            tokenClient.requestAccessToken();
+        }
+    </script>
+</body>
+</html>
